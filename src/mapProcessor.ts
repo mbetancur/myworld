@@ -1,4 +1,4 @@
-type MapObject = {
+export type MapObject = {
     height: number;
     id: number;
     name: string;

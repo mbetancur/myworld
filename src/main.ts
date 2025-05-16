@@ -1,6 +1,8 @@
 import kaplay from "kaplay";
-import { fetchMap, processMapFeatures } from "./mapProcessor";
-import { showDialogue } from "./utils";
+import { fetchMap } from "./mapProcessor";
+import { createPlayer } from "./player";
+import { createPet1, createPet2 } from "./pets";
+import { createGameMap } from "./gameMap";
 
 const scale = 3;
 
@@ -10,111 +12,54 @@ const k = kaplay({
     debug: true,
 });
 
-k.loadRoot("./"); // A good idea for Itch.io publishing later
+k.loadRoot("./");
 k.loadSprite("map", "sprites/mapV1.png");
-k.loadSprite("characters", "sprites/charactersV1.png", {
-    sliceX: 10,
+
+k.loadSprite("characters", "sprites/characterV2.png", {
+    sliceX: 7,
     sliceY: 4,
     anims: {
-        "idle": 0,
-        "walk-down": { from: 1, to: 3, loop: true, speed: 8 },
-        "walk-side": { from: 11, to: 13, loop: true, speed: 8 },
-        "walk-up": { from: 21, to: 23, loop: true, speed: 8 },
+        "idle": { from: 0, to: 3, loop: true, speed: 1 },
+        "idle-up": { from: 4, to: 6, loop: true, speed: 1 },
+        "idle-side": { from: 7, to: 10, loop: true, speed: 1 },
+        "walk-down": { from: 11, to: 16, loop: true, speed: 8 },
+        "walk-up": { from: 17, to: 21, loop: true, speed: 8 },
+        "walk-side": { from: 22, to: 27, loop: true, speed: 8 },
     }
-})
+});
+
+k.loadSprite("pet1", "sprites/pearlV1.png", {
+    sliceX: 2,
+    anims: {
+        "idle": 0,
+        "crouch": 1,
+    }
+});
+
+k.loadSprite("pet2", "sprites/pet2V1.png", {
+    sliceX: 10,
+    anims: {
+        "idle": 0,
+        "walk-down": { from: 0, to: 3, loop: true, speed: 8 },
+        "walk-side": { from: 4, to: 5, loop: true, speed: 8 },
+        "walk-up": { from: 6, to: 9, loop: true, speed: 8 },
+    }
+});
 
 k.setBackground(k.Color.fromHex("#2b202b"));
 
 k.scene("game", async () => {
-    const { boundaries, interactiveObjs } = await fetchMap("sprites/mapV2.json")
+    const { boundaries, interactiveObjs } = await fetchMap("sprites/mapV2.json");
 
-    const map = k.add([k.pos(0), k.sprite("map")]);
+    const gameMap = createGameMap(k, boundaries, interactiveObjs);
+    gameMap.setupBoundaries();
+    gameMap.setupInteractiveObjects();
 
-    const player = k.make([
-        k.pos(100, 170),
-        k.sprite("characters", { anim: "idle" }),
-        k.area(),
-        k.body(),
-        k.scale(1.4),
-        {
-            speed: 50,
-            isInDialogue: false,
-        },
-        "player"
-    ])
+    const { player } = createPlayer(k);
+    const pet1 = createPet1(k);
+    const pet2 = createPet2(k);
 
-    k.add(player)
-
-    processMapFeatures(boundaries, (obj) => {
-        map.add([
-            k.rect(16, 16),
-            k.area(),
-            k.body({ isStatic: true }),
-            k.pos(obj.x - 8, obj.y - 8), // - 8 to Center the boundary
-            k.opacity(0),
-            "boundary"
-        ])
-
-        player.onCollide("boundary", () => {
-            player.stop();
-        });
-    });
-
-    processMapFeatures(interactiveObjs, (obj) => {
-        map.add([
-            k.circle(1),
-            k.area(),
-            k.pos(obj.x, obj.y),
-            k.opacity(0),
-            "interactive"
-        ]);
-
-        player.onCollide("interactive", () => {
-            showDialogue(k, "Hello! This is an interactive object. You can add more text here to create a conversation or provide information.");
-        });
-    });
-
-    let isMoving = false;
-
-    k.onKeyDown("w", () => {
-        if (player.isInDialogue) return;
-        player.move(0, -50)
-        if (!isMoving) {
-            player.play("walk-up")
-            isMoving = true
-        }
-    })
-    k.onKeyDown("s", () => {
-        if (player.isInDialogue) return;
-        player.move(0, 50)
-        if (!isMoving) {
-            player.play("walk-down")
-            isMoving = true
-        }
-    })
-    k.onKeyDown("a", () => {
-        if (player.isInDialogue) return;
-        player.move(-50, 0)
-        if (!isMoving) {
-            player.play("walk-side")
-            player.flipX = true
-            isMoving = true
-        }
-    })
-    k.onKeyDown("d", () => {
-        if (player.isInDialogue) return;
-        player.move(50, 0)
-        if (!isMoving) {
-            player.play("walk-side")
-            player.flipX = false
-            isMoving = true
-        }
-    })
-
-    k.onKeyRelease(["w", "s", "a", "d"], () => {
-        isMoving = false
-        player.play("idle")
-    })
-})
+    gameMap.setupCollisions(player);
+});
 
 k.go("game");
