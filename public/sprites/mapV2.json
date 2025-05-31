@@ -694,37 +694,13 @@
               },
               {
                      "draworder": "topdown",
-                     "id": 5,
-                     "name": "PC",
-                     "objects": [
-                            {
-                                   "height": 0,
-                                   "id": 27,
-                                   "name": "",
-                                   "point": true,
-                                   "rotation": 0,
-                                   "type": "",
-                                   "visible": true,
-                                   "width": 0,
-                                   "x": 184,
-                                   "y": 169
-                            }
-                     ],
-                     "opacity": 1,
-                     "type": "objectgroup",
-                     "visible": true,
-                     "x": 0,
-                     "y": 0
-              },
-              {
-                     "draworder": "topdown",
                      "id": 6,
-                     "name": "Project1",
+                     "name": "interactive-objects",
                      "objects": [
                             {
                                    "height": 0,
                                    "id": 28,
-                                   "name": "",
+                                   "name": "project-1",
                                    "point": true,
                                    "rotation": 0,
                                    "type": "",
@@ -732,6 +708,18 @@
                                    "width": 0,
                                    "x": 119,
                                    "y": 163
+                            },
+                            {
+                                   "height": 0,
+                                   "id": 31,
+                                   "name": "pc",
+                                   "point": true,
+                                   "rotation": 0,
+                                   "type": "",
+                                   "visible": true,
+                                   "width": 0,
+                                   "x": 183,
+                                   "y": 169
                             }
                      ],
                      "opacity": 1,
@@ -741,8 +729,8 @@
                      "y": 0
               }
        ],
-       "nextlayerid": 7,
-       "nextobjectid": 30,
+       "nextlayerid": 8,
+       "nextobjectid": 32,
        "orientation": "orthogonal",
        "renderorder": "right-down",
        "tiledversion": "1.11.2",
